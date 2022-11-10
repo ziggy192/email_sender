@@ -6,7 +6,7 @@ COPY go.mod go.sum /src/
 
 RUN go mod download
 
-COPY docker /src/
+COPY . /src/
 
 ARG COMMIT_HASH
 
