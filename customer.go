@@ -2,6 +2,7 @@ package email_sender
 
 import "errors"
 
+// Customer defines model for customer
 type Customer struct {
 	Title     string `csv:"TITLE"`
 	FirstName string `csv:"FIRST_NAME"`

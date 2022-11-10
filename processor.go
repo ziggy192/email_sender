@@ -7,6 +7,7 @@ import (
 	"io"
 )
 
+// EmailProcessor coordinate components to process emails
 type EmailProcessor struct {
 	reader         Reader
 	sender         Sender
@@ -14,6 +15,7 @@ type EmailProcessor struct {
 	templateParser TemplateParser
 }
 
+// NewEmailProcessor create new instance
 func NewEmailProcessor(reader Reader, sender Sender, errHandler ErrHandler, templateParser TemplateParser) *EmailProcessor {
 	return &EmailProcessor{reader: reader, sender: sender, errHandler: errHandler, templateParser: templateParser}
 }

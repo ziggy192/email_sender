@@ -9,6 +9,7 @@ import (
 	"go.uber.org/atomic"
 )
 
+// FileEmailSender send emails to provided file
 type FileEmailSender struct {
 	outDir  string
 	fileIdx *atomic.Int64

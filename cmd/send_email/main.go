@@ -13,9 +13,8 @@ func main() {
 	templateFilePath := flag.String("template", "", "(required) path to email template json file")
 	customerFilePath := flag.String("customers", "", "(required) path to customers csv file")
 	outputDir := flag.String("out", "", "(required) path to output emails directory")
-	errorFilePath := flag.String("error", "", "(required) path to errors csv file") // todo create if not exists
+	errorFilePath := flag.String("error", "", "(required) path to errors csv file")
 
-	// todo make default value for error file
 	flag.Parse()
 
 	if len(*templateFilePath) == 0 || len(*customerFilePath) == 0 || len(*outputDir) == 0 || len(*errorFilePath) == 0 {

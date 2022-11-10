@@ -9,6 +9,7 @@ import (
 	"github.com/jszwec/csvutil"
 )
 
+// CustomerReader reads customers from csv file
 type CustomerReader struct {
 	customerFile *os.File
 	dec          *csvutil.Decoder

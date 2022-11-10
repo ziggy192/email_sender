@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// FileTemplateParser parses customers to emails with a loaded template from file
 type FileTemplateParser struct {
 	template     *EmailTemplate
 	templateFile *os.File
