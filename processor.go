@@ -52,13 +52,6 @@ func (e *EmailProcessor) Process(n int) (bool, error) {
 	return next, nil
 }
 
-func (c *Customer) Validate() error {
-	if len(c.Email) == 0 {
-		return errors.New("no email information")
-	}
-	return nil
-}
-
 type Reader interface {
 	Read(n int) ([]*Customer, error)
 }
