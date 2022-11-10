@@ -8,6 +8,7 @@ import (
 	"github.com/jszwec/csvutil"
 )
 
+// ErrExporter export error customers to file
 type ErrExporter struct {
 	encoder *csvutil.Encoder
 	errFile *os.File
