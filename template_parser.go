@@ -12,7 +12,7 @@ type FileTemplateParser struct {
 	templateFile *os.File
 }
 
-func NewTemplateParser(templateFilePath string) (tp *FileTemplateParser, err error) {
+func NewFileTemplateParser(templateFilePath string) (tp *FileTemplateParser, err error) {
 	var templateFile *os.File
 	defer func() {
 		if err != nil && templateFile != nil {

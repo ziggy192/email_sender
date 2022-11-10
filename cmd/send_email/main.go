@@ -29,7 +29,7 @@ func main() {
 	}
 	defer er.Close()
 
-	tp, err := es.NewTemplateParser(*templateFilePath)
+	tp, err := es.NewFileTemplateParser(*templateFilePath)
 	if err != nil {
 		panic(err)
 	}
