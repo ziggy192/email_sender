@@ -6,7 +6,3 @@ type Customer struct {
 	LastName  string `csv:"LAST_NAME"`
 	Email     string `csv:"EMAIL"`
 }
-
-type Error struct {
-	Customer
-}

@@ -2,30 +2,23 @@ package email_sender
 
 import (
 	"encoding/csv"
-	"encoding/json"
+	"errors"
 	"io"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/jszwec/csvutil"
 )
 
-type EmailReader struct {
-	template     *EmailTemplate
-	templateFile *os.File
+type CustomerReader struct {
 	customerFile *os.File
 	dec          *csvutil.Decoder
 }
 
-func NewEmailReader(templateFilePath, customerPath string) (er *EmailReader, err error) {
-	var templateFile, customerFile *os.File
+func NewEmailReader(customerPath string) (er *CustomerReader, err error) {
+	var customerFile *os.File
 	cleanUp := func() {
 		if customerFile != nil {
 			_ = customerFile.Close()
-		}
-		if templateFile != nil {
-			_ = templateFile.Close()
 		}
 	}
 
@@ -34,18 +27,6 @@ func NewEmailReader(templateFilePath, customerPath string) (er *EmailReader, err
 			cleanUp()
 		}
 	}()
-
-	templateFile, err = os.Open(templateFilePath)
-	if err != nil {
-		LogErr(err)
-		return nil, err
-	}
-
-	var template = new(EmailTemplate)
-	if err := json.NewDecoder(templateFile).Decode(&template); err != nil {
-		LogErr(err)
-		return nil, err
-	}
 
 	customerFile, err = os.Open(customerPath)
 	if err != nil {
@@ -58,49 +39,33 @@ func NewEmailReader(templateFilePath, customerPath string) (er *EmailReader, err
 		LogErr(err)
 		return
 	}
-	return &EmailReader{
-		template:     template,
-		templateFile: templateFile,
+	return &CustomerReader{
 		customerFile: customerFile,
 		dec:          dec,
 	}, nil
 }
 
-func (er *EmailReader) Read(n int) ([]*Email, error) {
-	emails := make([]*Email, 0, n)
+// Read reads upto n next customers. Return io.EOF when no next customers to read
+func (cr *CustomerReader) Read(n int) ([]*Customer, error) {
+	customers := make([]*Customer, 0, n)
 	for i := 0; i < n; i++ {
 		var c *Customer
-		if err := er.dec.Decode(&c); err == io.EOF {
-			emails = append(emails, er.parseEmail(c))
-			return emails, io.EOF
-		} else if err != nil && err != io.EOF {
+		err := cr.dec.Decode(&c)
+		if err != nil && err != io.EOF {
 			LogErr(err)
 			return nil, err
+		} else if errors.Is(err, io.EOF) {
+			return customers, err
 		}
-		emails = append(emails, er.parseEmail(c))
+		customers = append(customers, c)
 	}
-	return emails, nil
+	return customers, nil
 }
 
-func (er *EmailReader) parseEmail(c *Customer) *Email {
-	today := time.Now().Format("02 Jan 2006")
-	r := strings.NewReplacer("{{TITLE}}", c.Title, "{{FIRST_NAME}}", c.FirstName, "{{LAST_NAME}}", c.LastName, "{{TODAY}}", today)
-	body := r.Replace(er.template.Body)
-	return &Email{
-		From:     er.template.From,
-		To:       c.Email,
-		Subject:  er.template.Subject,
-		MimeType: er.template.MimeType,
-		Body:     body,
+func (cr *CustomerReader) Close() {
+	if cr.customerFile != nil {
+		_ = cr.customerFile.Close()
+		cr.customerFile = nil
 	}
-}
-func (er *EmailReader) Close() {
-	if er.customerFile != nil {
-		_ = er.customerFile.Close()
-		er.customerFile = nil
-	}
-	if er.templateFile != nil {
-		_ = er.templateFile.Close()
-		er.templateFile = nil
-	}
+
 }

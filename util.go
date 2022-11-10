@@ -1,7 +1,12 @@
 package email_sender
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
-func LogErr(err error) {
-	log.Printf("[error] %s", err.Error())
+func LogErr(v ...any) {
+	args := make([]any, 0, 1+len(v))
+	args = append(append(args, "[error] "), v...)
+	_ = log.Output(2, fmt.Sprint(args...))
 }

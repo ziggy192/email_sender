@@ -1,26 +1,58 @@
 package email_sender
 
-import "log"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
 
-type ErrEmail struct {
-	Email
-	Err error `json:"-"`
-}
+	"go.uber.org/atomic"
+)
 
 type FileEmailSender struct {
-	outDir string
+	outDir  string
+	fileIdx *atomic.Int64
 }
 
-func NewFileEmailSender(outDir string) *FileEmailSender {
-	return &FileEmailSender{outDir: outDir}
+func NewFileEmailSender(outDir string) (*FileEmailSender, error) {
+	entries, err := os.ReadDir(outDir)
+	if errors.Is(err, os.ErrNotExist) {
+		LogErr("directory ", outDir, " not exists: ", err)
+		return nil, err
+	}
+	return &FileEmailSender{
+		outDir:  outDir,
+		fileIdx: atomic.NewInt64(int64(len(entries))),
+	}, nil
 }
 
 // Send sends emails in batch and returns errors in the input order
 func (f *FileEmailSender) Send(emails []*Email) ([]*ErrEmail, error) {
-	// todo create dir if not exists
-	// todo implement this
-	for _, email := range emails {
-		log.Printf("send email %+v", email)
+	res := make([]*ErrEmail, len(emails))
+	for i, email := range emails {
+		idx := f.fileIdx.Inc()
+		f, err := os.Create(f.outDir + fmt.Sprintf("/sent_email_%d.json", idx))
+		if err != nil {
+			LogErr(err)
+			res[i] = &ErrEmail{Email: email, Err: err}
+			continue
+		}
+		ec := json.NewEncoder(f)
+		ec.SetIndent("", "    ")
+		ec.SetEscapeHTML(false)
+		err = ec.Encode(email)
+		if err != nil {
+			LogErr(err)
+			res[i] = &ErrEmail{Email: email, Err: err}
+			continue
+		}
+		res[i] = &ErrEmail{Email: email}
+		_ = f.Close()
 	}
-	return nil, nil
+	return res, nil
+}
+
+type ErrEmail struct {
+	*Email
+	Err error
 }
