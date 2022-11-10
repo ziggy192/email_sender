@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	er, err := es.NewEmailReader(*customerFilePath)
+	er, err := es.NewCustomerReader(*customerFilePath)
 	if err != nil {
 		panic(err)
 	}

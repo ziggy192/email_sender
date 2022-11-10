@@ -14,7 +14,7 @@ type CustomerReader struct {
 	dec          *csvutil.Decoder
 }
 
-func NewEmailReader(customerPath string) (er *CustomerReader, err error) {
+func NewCustomerReader(customerPath string) (er *CustomerReader, err error) {
 	var customerFile *os.File
 	cleanUp := func() {
 		if customerFile != nil {
