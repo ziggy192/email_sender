@@ -56,3 +56,15 @@ docker run -v /$(pwd)/etc/test/:/app/test/  email_sender_v1  ./send_email -custo
 ```
 
 4. Check result in `out` and `errors.csv`
+
+## Test 
+
+```shell
+make test
+```
+
+## Format code and check lint
+```shell
+make fmt
+make lint
+```
