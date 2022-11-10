@@ -1,5 +1,7 @@
 package email_sender
 
+//go:generate mockgen -source processor.go -destination processor_mock.go -package email_sender
+
 import (
 	"errors"
 	"io"
@@ -9,10 +11,10 @@ type EmailProcessor struct {
 	reader         Reader
 	sender         Sender
 	errHandler     ErrHandler
-	templateParser *TemplateParser
+	templateParser TemplateParser
 }
 
-func NewEmailProcessor(reader Reader, sender Sender, errHandler ErrHandler, templateParser *TemplateParser) *EmailProcessor {
+func NewEmailProcessor(reader Reader, sender Sender, errHandler ErrHandler, templateParser TemplateParser) *EmailProcessor {
 	return &EmailProcessor{reader: reader, sender: sender, errHandler: errHandler, templateParser: templateParser}
 }
 
@@ -63,6 +65,10 @@ type Reader interface {
 
 type Sender interface {
 	Send(emails []*Email) ([]*ErrEmail, error)
+}
+
+type TemplateParser interface {
+	ParseEmails(cs []*Customer) []*Email
 }
 
 type ErrHandler interface {

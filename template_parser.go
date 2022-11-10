@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-type TemplateParser struct {
+type FileTemplateParser struct {
 	template     *EmailTemplate
 	templateFile *os.File
 }
 
-func NewTemplateParser(templateFilePath string) (tp *TemplateParser, err error) {
+func NewTemplateParser(templateFilePath string) (tp *FileTemplateParser, err error) {
 	var templateFile *os.File
 	defer func() {
 		if err != nil && templateFile != nil {
@@ -32,13 +32,13 @@ func NewTemplateParser(templateFilePath string) (tp *TemplateParser, err error) 
 		return nil, err
 	}
 
-	return &TemplateParser{
+	return &FileTemplateParser{
 		template:     template,
 		templateFile: templateFile,
 	}, nil
 }
 
-func (t *TemplateParser) ParseEmails(cs []*Customer) []*Email {
+func (t *FileTemplateParser) ParseEmails(cs []*Customer) []*Email {
 	var emails = make([]*Email, 0, len(cs))
 	for _, c := range cs {
 		today := time.Now().Format("02 Jan 2006")
@@ -55,7 +55,7 @@ func (t *TemplateParser) ParseEmails(cs []*Customer) []*Email {
 	return emails
 }
 
-func (t *TemplateParser) Close() {
+func (t *FileTemplateParser) Close() {
 	if t.templateFile != nil {
 		_ = t.templateFile.Close()
 		t.templateFile = nil
